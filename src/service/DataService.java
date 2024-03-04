@@ -1,18 +1,16 @@
 package service;
 
-import model.Student;
-import model.Teacher;
-import model.Type;
-import model.User;
+import model.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataService {
     private List<User> userList;
+    private List<StudentGroup> studentGroupList;
 
     public void create(String firstName, String lastName, String middleName, Type type) {
-        int id = getFreeId(type);
+        int id = getFreeUserId(type);
         if (Type.STUDENT == type) {
             Student student = new Student(firstName, lastName, middleName, id);
             userList.add(student);
@@ -54,7 +52,26 @@ public class DataService {
         return students;
     }
 
-    private int getFreeId(Type type) {
+    public StudentGroup createStudentGroup(int teacherId, List<Integer> studentIds) {
+        int id = getFreeStudentGroupId();
+        User user = getUserById(Type.TEACHER, teacherId);
+        Teacher teacher = (Teacher) user;
+        List<Student> studentList = getStudentLIstByIds(studentIds);
+        return new StudentGroup(teacher, studentList, id);
+    }
+
+    public List<Student> getStudentLIstByIds(List<Integer> studentIds) {
+        List<Student> studentList = new ArrayList<>();
+        for (Integer id: studentIds) {
+            User user = getUserById(Type.STUDENT, id);
+            Student student = (Student) user;
+            studentList.add(student);
+        }
+        return studentList;
+    }
+
+
+    private int getFreeUserId(Type type) {
         boolean itsStudent = Type.STUDENT == type;
         int lastId = 1;
         for (User user: userList) {
@@ -65,6 +82,14 @@ public class DataService {
             if (user instanceof Student && itsStudent) {
                 lastId = ((Student) user).getStudentId() + 1;
             }
+        }
+        return lastId;
+    }
+
+    private int getFreeStudentGroupId() {
+        int lastId = 1;
+        for (StudentGroup studentGroup: studentGroupList) {
+            lastId = studentGroup.getStudentGroupId() + 1;
         }
         return lastId;
     }

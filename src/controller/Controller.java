@@ -24,4 +24,8 @@ public class Controller {
             studentView.printOnConsole(student);
         }
     }
+
+    public void createStudentGroup(int teacherId, List<Integer> studentIds) {
+        service.createStudentGroup(teacherId, studentIds);
+    }
 }
